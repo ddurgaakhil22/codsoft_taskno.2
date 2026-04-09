@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUIZORA — Play</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .player-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: var(--space-10) var(--space-6) var(--space-16);
+      min-height: calc(100vh - 73px);
+    }
+
+    .player-card {
+      width: 100%;
+      max-width: 680px;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-2xl);
+      overflow: hidden;
+      backdrop-filter: var(--blur-md);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ── Progress / top bar ──────────────────── */
+    .player-top {
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .q-counter {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .progress-bar {
+      flex: 1;
+    }
+
+    /* ── Timer ring ──────────────────────────── */
+    .timer-ring-wrap {
+      position: relative;
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+    }
+
+    .timer-ring-wrap svg {
+      transform: rotate(-90deg);
+    }
+
+    .timer-bg {
+      fill: none;
+      stroke: var(--bg-elevated);
+      stroke-width: 4;
+    }
+
+    .timer-fill {
+      fill: none;
+      stroke: var(--neon-violet);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 138.23;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+    }
+
+    .timer-fill.warn {
+      stroke: var(--neon-amber);
+    }
+
+    .timer-fill.danger {
+      stroke: var(--neon-pink);
+      animation: timerPulse 0.5s infinite;
+    }
+
+    @keyframes timerPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .timer-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    /* ── Question body ───────────────────────── */
+    .player-body {
+      padding: var(--space-8) var(--space-8) var(--space-6);
+    }
+
+    .streak-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-5);
+      min-height: 32px;
+    }
+
+    .question-text {
+      font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+      font-weight: 600;
+      line-height: 1.5;
+      margin-bottom: var(--space-6);
+    }
+
+    .answers-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    /* ── Explanation box ─────────────────────── */
+    .explanation-box {
+      margin-top: var(--space-5);
+      padding: var(--space-4) var(--space-5);
+      background: rgba(6, 182, 212, 0.07);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      display: none;
+      animation: fadeUp 0.4s ease;
+    }
+
+    .explanation-box.visible {
+      display: block;
+    }
+
+    .explanation-box strong {
+      color: var(--neon-cyan);
+    }
+
+    /* ── Player footer ───────────────────────── */
+    .player-footer {
+      padding: var(--space-5) var(--space-8);
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kbd-hint {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      font-size: 0.7rem;
+    }
+
+    /* ── Start screen ────────────────────────── */
+    .start-screen {
+      padding: var(--space-12) var(--space-8);
+      text-align: center;
+    }
+
+    .start-screen .quiz-icon {
+      font-size: 3.5rem;
+      margin-bottom: var(--space-5);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      margin: var(--space-8) 0;
+    }
+
+    .info-tile {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      text-align: center;
+    }
+
+    .info-tile .val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-family: var(--font-display);
+    }
+
+    .info-tile .lbl {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── Timeout screen ──────────────────────── */
+    .timeout-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 5, 13, 0.85);
+      border-radius: var(--radius-2xl);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: var(--space-4);
+      text-align: center;
+      padding: var(--space-8);
+      backdrop-filter: var(--blur-sm);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .timeout-overlay.visible {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .player-card-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    @media (max-width: 640px) {
+      .player-body {
+        padding: var(--space-6) var(--space-5);
+      }
+
+      .player-footer {
+        padding: var(--space-4) var(--space-5);
+      }
+
+      .player-top {
+        padding: var(--space-4) var(--space-5);
+      }
+
+      .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .player-wrap {
+        padding: var(--space-6) var(--space-3) var(--space-8);
+      }
+
+      .player-card {
+        border-radius: var(--radius-lg);
+      }
+
+      .player-top {
+        padding: var(--space-3) var(--space-3);
+        gap: var(--space-2);
+        flex-wrap: wrap;
+      }
+
+      .q-counter {
+        font-size: 0.75rem;
+      }
+
+      .timer-ring-wrap {
+        width: 44px;
+        height: 44px;
+      }
+
+      .timer-fill, .timer-bg {
+        stroke-width: 3;
+      }
+
+      .player-body {
+        padding: var(--space-4) var(--space-3);
+      }
+
+      .question-txt {
+        font-size: 1rem;
+        margin-bottom: var(--space-4);
+      }
+
+      .answer-option {
+        padding: var(--space-3);
+        gap: var(--space-3);
+        font-size: 0.9rem;
+      }
+
+      .answer-option input {
+        width: 18px;
+        height: 18px;
+      }
+
+      .player-footer {
+        padding: var(--space-3) var(--space-3);
+        gap: var(--space-2);
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: var(--space-2) var(--space-3);
+        font-size: 0.85rem;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+      }
+
+      .info-box {
+        padding: var(--space-3);
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <nav class="nav" id="app-nav"></nav>
+
+  <div class="page-wrapper" style="z-index:1;position:relative">
+    <div class="player-wrap">
+
+      <!-- Player card wrapper (for timeout overlay) -->
+      <div class="player-card-wrap" id="player-card-wrap">
+        <div class="player-card" id="player-card">
+          <!-- Content swapped by JS -->
+          <div class="start-screen" id="start-screen">
+            <div class="quiz-icon">🧠</div>
+            <h2 class="display-md" id="quiz-title-display">Loading...</h2>
+            <p class="text-secondary" id="quiz-desc-display" style="margin-top:var(--space-3)"></p>
+
+            <div class="info-grid" id="info-grid">
+              <!-- filled by JS -->
+            </div>
+
+            <div class="flex gap-4 justify-center" style="flex-wrap:wrap">
+              <button class="btn btn-primary btn-lg" onclick="startQuiz()">▷ Start Quiz</button>
+              <a href="dashboard.html" class="btn btn-ghost btn-lg">← Back</a>
+            </div>
+
+            <p class="text-xs text-muted" style="margin-top:var(--space-5)">
+              <span class="kbd">1</span>–<span class="kbd">4</span> to answer &nbsp;•&nbsp; <span
+                class="kbd">Enter</span> to continue
+            </p>
+          </div>
+        </div>
+
+        <!-- Timeout overlay -->
+        <div class="timeout-overlay" id="timeout-overlay">
+          <div style="font-size:3rem">⏱️</div>
+          <h3 style="font-size:1.5rem;font-weight:700">Time's Up!</h3>
+          <p class="text-secondary">The correct answer was:</p>
+          <div id="timeout-correct" style="font-size:1.1rem;font-weight:600;color:var(--neon-green)"></div>
+          <button class="btn btn-primary" onclick="hideTimeout(); nextQuestion()">Continue →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="quiz.js"></script>
+  <script>
+    'use strict';
+
+    const params = new URLSearchParams(location.search);
+    const quizId = params.get('quiz');
+    let quizStarted = false;
+    let awaitingNext = false;
+
+    // ── Load quiz data for start screen ───────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!quizId) { location.href = 'dashboard.html'; return; }
+
+      const quiz = Quizzes.get(quizId);
+      if (!quiz) { toast('Quiz not found', 'error'); setTimeout(() => location.href = 'dashboard.html', 2000); return; }
+
+      // Check if user can access this quiz
+      const user = User.get();
+      if (!user?.isLoggedIn && !quiz.isDemo) {
+        toast('Please log in to access this quiz', 'error');
+        setTimeout(() => location.href = 'login.html', 2000);
+        return;
+      }
+
+      // Check demo limit for guests
+      if (!user?.isLoggedIn && quiz.isDemo && (user?.demoQuizzesTaken || 0) >= 3) {
+        toast('You\'ve tried 3 free demo quizzes. Please log in to continue!', 'error');
+        setTimeout(() => location.href = 'login.html', 2000);
+        return;
+      }
+
+      // Populate start screen
+      document.getElementById('quiz-title-display').textContent = quiz.title;
+      document.getElementById('quiz-desc-display').textContent = quiz.description || '';
+
+      const diff = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard' };
+      const grid = document.getElementById('info-grid');
+      grid.innerHTML = `
+      <div class="info-tile">
+        <div class="val">${quiz.questions.length}</div>
+        <div class="lbl">Questions</div>
+      </div>
+      <div class="info-tile">
+        <div class="val">${quiz.timePerQuestion || 30}s</div>
+        <div class="lbl">Per Question</div>
+      </div>
+      <div class="info-tile">
+        <div class="val">${diff[quiz.difficulty] || '🟢 Easy'}</div>
+        <div class="lbl">Difficulty</div>
+      </div>
+    `;
+    });
+
+    // ── Start ──────────────────────────────────────────────
+    function startQuiz() {
+      if (!QuizEngine.load(quizId)) {
+        toast('Could not load quiz', 'error'); return;
+      }
+      quizStarted = true;
+      renderGameUI();
+
+      QuizEngine.onQuestion = showQuestion;
+      QuizEngine.onAnswer = showAnswerResult;
+      QuizEngine.onTick = updateTimer;
+      QuizEngine.onTimeout = handleTimeout;
+      QuizEngine.onFinish = (result) => {
+        location.href = 'results.html';
+      };
+
+      QuizEngine.start();
+    }
+
+    // ── Render game UI ────────────────────────────────────
+    function renderGameUI() {
+      const card = document.getElementById('player-card');
+      card.innerHTML = `
+      <div class="player-top">
+        <span class="q-counter" id="q-counter">1 / ?</span>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+        <div class="timer-ring-wrap">
+          <svg width="52" height="52" viewBox="0 0 52 52">
+            <circle class="timer-bg"   cx="26" cy="26" r="22"/>
+            <circle class="timer-fill" cx="26" cy="26" r="22" id="timer-ring"/>
+          </svg>
+          <div class="timer-label" id="timer-label">30</div>
+        </div>
+      </div>
+
+      <div class="player-body">
+        <div class="streak-row">
+          <div id="streak-display"></div>
+          <div id="xp-display" class="text-muted text-sm font-mono"></div>
+        </div>
+        <div class="question-text" id="question-text">Loading...</div>
+        <div class="answers-list" id="answers-list"></div>
+        <div class="explanation-box" id="explanation-box">
+          <strong>💡 Explanation:</strong> <span id="explanation-text"></span>
+        </div>
+      </div>
+
+      <div class="player-footer">
+        <div class="kbd-hint">
+          <span class="kbd">1</span>–<span class="kbd">4</span> answer &nbsp;•&nbsp; <span class="kbd">Enter / Space</span> next
+        </div>
+        <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none">
+          Next →
+        </button>
+      </div>
+    `;
+    }
+
+    // ── Show question ─────────────────────────────────────
+    function showQuestion(q, idx, total) {
+      awaitingNext = false;
+
+      document.getElementById('q-counter').textContent = `${idx + 1} / ${total}`;
+      document.getElementById('progress-fill').style.width = `${(idx / total) * 100}%`;
+      document.getElementById('question-text').textContent = q.text;
+      document.getElementById('explanation-box').classList.remove('visible');
+      document.getElementById('next-btn').style.display = 'none';
+      document.getElementById('xp-display').textContent = `${QuizEngine.xp} XP`;
+
+      // Streak
+      const streak = QuizEngine.streak;
+      const streakEl = document.getElementById('streak-display');
+      if (streak >= 2) {
+        streakEl.innerHTML = `<div class="streak-counter">🔥 ${streak} streak</div>`;
+      } else {
+        streakEl.innerHTML = '';
+      }
+
+      // Answers
+      const labels = ['A', 'B', 'C', 'D'];
+      const list = document.getElementById('answers-list');
+      list.innerHTML = q.options.map((opt, i) => `
+      <div class="answer-option" id="opt-${i}" onclick="selectAnswer(${i})">
+        <div class="answer-key">${labels[i]}</div>
+        <div class="answer-text">${opt}</div>
+      </div>
+    `).join('');
+    }
+
+    // ── User selects answer ───────────────────────────────
+    function selectAnswer(idx) {
+      if (QuizEngine.locked) return;
+      QuizEngine.answer(idx);
+    }
+
+    // ── Show result ───────────────────────────────────────
+    function showAnswerResult(isCorrect, correctIdx, chosenIdx) {
+      awaitingNext = true;
+
+      const opts = document.querySelectorAll('.answer-option');
+      opts.forEach((el, i) => {
+        if (i === correctIdx) el.classList.add('correct');
+        else if (i === chosenIdx && !isCorrect) el.classList.add('wrong');
+      });
+
+      // Explanation
+      const q = QuizEngine.questions[QuizEngine.currentIdx];
+      if (q.explanation) {
+        document.getElementById('explanation-text').textContent = q.explanation;
+        document.getElementById('explanation-box').classList.add('visible');
+      }
+
+      // XP update
+      document.getElementById('xp-display').textContent = `${QuizEngine.xp} XP`;
+
+      const nextBtn = document.getElementById('next-btn');
+      const isLast = QuizEngine.currentIdx >= QuizEngine.questions.length - 1;
+      nextBtn.textContent = isLast ? 'Finish ✓' : 'Next →';
+      nextBtn.style.display = 'flex';
+    }
+
+    function nextQuestion() {
+      if (!awaitingNext) return;
+      QuizEngine.next();
+    }
+
+    // ── Timer ─────────────────────────────────────────────
+    function updateTimer(timeLeft, total) {
+      const ring = document.getElementById('timer-ring');
+      const label = document.getElementById('timer-label');
+      if (!ring || !label) {
+        console.warn("[Player] Timer elements not found!");
+        return;
+      }
+
+      const circumference = 138.23;
+      const ratio = (timeLeft || 0) / (total || 30);
+      const offset = circumference * (1 - ratio);
+
+      ring.style.strokeDashoffset = offset;
+      label.textContent = timeLeft;
+
+      ring.className = 'timer-fill';
+      if (ratio <= 0.33) ring.classList.add('danger');
+      else if (ratio <= 0.5) ring.classList.add('warn');
+
+      label.style.color = ratio <= 0.33 ? 'var(--neon-pink)'
+        : ratio <= 0.5 ? 'var(--neon-amber)'
+          : 'var(--text-primary)';
+    }
+
+    // ── Timeout ───────────────────────────────────────────
+    let timeoutTimer = null;
+
+    function handleTimeout() {
+      awaitingNext = true;
+      const q = QuizEngine.questions[QuizEngine.currentIdx];
+      const overlay = document.getElementById('timeout-overlay');
+      if (!overlay) return;
+
+      document.getElementById('timeout-correct').textContent = q.options[q.correct];
+      overlay.classList.add('visible');
+
+      // Also mark correct answer in list
+      const opts = document.querySelectorAll('.answer-option');
+      if (opts[q.correct]) opts[q.correct].classList.add('correct');
+
+      // Automatically move to next question after 2.5 seconds
+      clearTimeout(timeoutTimer);
+      timeoutTimer = setTimeout(() => {
+        if (overlay.classList.contains('visible')) {
+          hideTimeout();
+          nextQuestion();
+        }
+      }, 2500);
+    }
+
+    function hideTimeout() {
+      clearTimeout(timeoutTimer);
+      const overlay = document.getElementById('timeout-overlay');
+      if (overlay) overlay.classList.remove('visible');
+    }
+
+    // ── Keyboard shortcuts ────────────────────────────────
+    document.addEventListener('keydown', e => {
+      if (!quizStarted) {
+        if (e.key === 'Enter' || e.key === ' ') startQuiz();
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        if (confirm('Quit quiz?')) { QuizEngine.abort(); location.href = 'dashboard.html'; }
+        return;
+      }
+
+      if (!awaitingNext) {
+        const map = { '1': 0, '2': 1, '3': 2, '4': 3 };
+        if (map[e.key] !== undefined) selectAnswer(map[e.key]);
+      } else {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          hideTimeout();
+          nextQuestion();
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>

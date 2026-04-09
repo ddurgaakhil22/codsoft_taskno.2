@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUIZORA — Quiz Library</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: var(--space-6);
+      align-items: start;
+    }
+
+    /* ── Toolbar ─────────────────────────────── */
+    .toolbar {
+      display: flex;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+    }
+
+    .search-wrap { flex: 1; min-width: 200px; }
+
+    /* ── Filter chips ────────────────────────── */
+    .filter-chips {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-6);
+    }
+
+    /* ── Quiz grid ────────────────────────────── */
+    .quiz-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--space-4);
+    }
+
+    .quiz-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all var(--transition-base);
+      cursor: pointer;
+    }
+
+    .quiz-card:hover {
+      border-color: rgba(124,58,237,0.3);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    .quiz-card-top {
+      padding: var(--space-5) var(--space-5) var(--space-4);
+      flex: 1;
+    }
+
+    .quiz-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-3);
+    }
+
+    .quiz-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+      line-height: 1.3;
+    }
+
+    .quiz-card-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: var(--space-3);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .quiz-card-stats {
+      display: flex;
+      gap: var(--space-4);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .quiz-card-actions {
+      display: flex;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .quiz-action-btn {
+      flex: 1;
+      padding: var(--space-3);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+    }
+
+    .quiz-action-btn:hover { color: var(--text-primary); background: var(--glass-hover); }
+    .quiz-action-btn.play  { color: var(--neon-violet); }
+    .quiz-action-btn.play:hover { background: rgba(124,58,237,0.1); }
+    .quiz-action-btn:not(:last-child) { border-right: 1px solid var(--glass-border); }
+
+    /* ── User XP card ─────────────────────────── */
+    .xp-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-4);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .xp-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top, rgba(245,158,11,0.1), transparent 70%);
+    }
+
+    .xp-avatar {
+      font-size: 2.5rem;
+      margin-bottom: var(--space-3);
+    }
+
+    .xp-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+
+    .xp-bar-wrap {
+      margin: var(--space-4) 0;
+      background: var(--bg-elevated);
+      height: 6px;
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .xp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-amber), var(--neon-pink));
+      border-radius: 100px;
+      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── Leaderboard panel ────────────────────── */
+    .lb-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .lb-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-5) var(--space-5) var(--space-4);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .lb-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 1rem;
+      transition: transform var(--transition-base);
+    }
+
+    .lb-toggle.collapsed { transform: rotate(-90deg); }
+
+    .lb-body {
+      padding: var(--space-3) var(--space-4);
+      max-height: 500px;
+      overflow-y: auto;
+      transition: max-height var(--transition-slow);
+    }
+
+    .lb-body.collapsed { max-height: 0; padding: 0; overflow: hidden; }
+
+    /* ── Responsive ────────────────────────────── */
+    @media (max-width: 1024px) {
+      .dashboard-layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+
+      .toolbar {
+        gap: var(--space-2);
+      }
+
+      .search-wrap { 
+        min-width: 0;
+      }
+
+      .quiz-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--space-3);
+      }
+
+      .quiz-card-title {
+        font-size: 0.95rem;
+      }
+
+      .quiz-card-desc {
+        font-size: 0.8rem;
+      }
+
+      .quiz-card-top {
+        padding: var(--space-3);
+      }
+
+      .quiz-action-btn {
+        font-size: 0.7rem;
+        padding: var(--space-2);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dashboard-layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+      }
+
+      .toolbar {
+        gap: var(--space-2);
+        flex-direction: column;
+      }
+
+      .search-wrap {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .quiz-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+      }
+
+      .quiz-card {
+        border-radius: var(--radius-lg);
+      }
+
+      .quiz-card-title {
+        font-size: 0.9rem;
+        margin-bottom: var(--space-1);
+      }
+
+      .quiz-card-desc {
+        font-size: 0.75rem;
+        margin-bottom: var(--space-2);
+      }
+
+      .quiz-card-top {
+        padding: var(--space-2) var(--space-3);
+      }
+
+      .quiz-card-meta {
+        gap: var(--space-2);
+      }
+
+      .quiz-action-btn {
+        font-size: 0.65rem;
+        padding: var(--space-2);
+      }
+
+      .xp-card {
+        padding: var(--space-4);
+        margin-bottom: var(--space-3);
+      }
+
+      .xp-avatar {
+        font-size: 2rem;
+        margin-bottom: var(--space-2);
+      }
+
+      .xp-name {
+        font-size: 1rem;
+      }
+
+      .lb-header {
+        padding: var(--space-4) var(--space-3);
+        flex-wrap: wrap;
+        gap: var(--space-2);
+      }
+
+      .lb-body {
+        max-height: 400px;
+        padding: var(--space-2);
+      }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .quiz-card { animation: fadeUp 0.4s ease both; }
+  </style>
+</head>
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <nav class="nav" id="app-nav"></nav>
+
+  <div class="page-wrapper" style="z-index:1;position:relative">
+    <div class="container" style="padding-top:var(--space-10);padding-bottom:var(--space-16)">
+
+      <!-- Library Navigation Tabs -->
+      <div class="library-nav">
+        <button class="lib-tab active" id="tab-explore" onclick="setTab('explore')">🌍 Explore</button>
+        <button class="lib-tab" id="tab-my" onclick="setTab('my')">🔒 My Quizzes</button>
+      </div>
+
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6" style="margin-bottom:var(--space-6)">
+        <div>
+          <h1 class="display-md" id="page-title">Explore Public Quizzes</h1>
+          <p class="text-secondary text-sm" style="margin-top:var(--space-2)" id="quiz-count-sub">Loading...</p>
+        </div>
+        <div id="create-btn-container">
+        </div>
+      </div>
+
+      <div class="dashboard-layout">
+        <!-- Main content -->
+        <div>
+          <!-- Toolbar -->
+          <div class="toolbar">
+            <div class="search-wrap">
+              <span class="search-icon">⌕</span>
+              <div class="search-container">
+                <input type="text" class="input" id="search-input"
+                  placeholder="Search by topic (e.g. Science, Space...)" oninput="handleSearchInput(event)">
+                <div class="search-suggestions" id="search-suggestions"></div>
+              </div>
+            </div>
+            <select class="select" id="sort-select" onchange="filterQuizzes()" style="width:auto">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="popular">Most Played</option>
+              <option value="az">A → Z</option>
+            </select>
+          </div>
+
+          <!-- Category filters -->
+          <div class="filter-chips" id="filter-chips">
+            <div class="chip active" data-cat="all" onclick="setCategory('all')">All</div>
+            <div class="chip" data-cat="Science"     onclick="setCategory('Science')">🔬 Science</div>
+            <div class="chip" data-cat="History"     onclick="setCategory('History')">📜 History</div>
+            <div class="chip" data-cat="Math"        onclick="setCategory('Math')">➗ Math</div>
+            <div class="chip" data-cat="Tech"        onclick="setCategory('Tech')">💻 Tech</div>
+            <div class="chip" data-cat="Geography"   onclick="setCategory('Geography')">🌍 Geography</div>
+            <div class="chip" data-cat="Pop Culture" onclick="setCategory('Pop Culture')">🎬 Pop Culture</div>
+            <div class="chip" data-cat="Language"    onclick="setCategory('Language')">🗣 Language</div>
+            <div class="chip" data-cat="General"     onclick="setCategory('General')">🧩 General</div>
+          </div>
+
+          <!-- Quiz grid -->
+          <div class="quiz-grid" id="quiz-grid"></div>
+
+          <!-- Empty state -->
+          <div class="empty-state hidden" id="empty-library">
+            <div class="empty-icon">📚</div>
+            <div class="empty-title">No quizzes found</div>
+            <p class="empty-desc">Try a different search or filter, or create a new quiz.</p>
+            <button class="btn btn-primary mt-4" id="empty-create-btn" style="margin-top:var(--space-4)">+ Create Quiz</button>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div>
+          <!-- XP Card -->
+          <div class="xp-card" id="xp-card"></div>
+
+          <!-- Leaderboard -->
+          <div class="lb-panel">
+            <div class="lb-header">
+              <div class="flex items-center gap-3">
+                <span style="font-size:1.1rem">🏆</span>
+                <span class="font-bold">Leaderboard</span>
+              </div>
+              <button class="lb-toggle" id="lb-toggle" onclick="toggleLeaderboard()">▾</button>
+            </div>
+            <div class="lb-body" id="lb-body"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete confirm modal -->
+  <div class="modal-overlay" id="delete-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Delete Quiz?</div>
+        <button class="modal-close" onclick="closeModal('delete-modal')">✕</button>
+      </div>
+      <p class="text-secondary" style="margin-bottom:var(--space-6)">
+        This will permanently delete "<strong id="delete-quiz-title"></strong>" and all its attempt history.
+      </p>
+      <div class="flex gap-3">
+        <button class="btn btn-pink w-full" onclick="confirmDelete()">Delete</button>
+        <button class="btn btn-ghost" onclick="closeModal('delete-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+  'use strict';
+
+  let activeCategory = 'all';
+  let activeTab = 'explore';
+  let pendingDeleteId = null;
+  let lbCollapsed = false;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const user = User.get();
+    const createBtnContainer = document.getElementById('create-btn-container');
+    
+    // Check URL for tab
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'my') {
+      activeTab = 'my';
+    }
+
+    // Show create button only for logged-in users
+    if (user?.isLoggedIn) {
+      createBtnContainer.innerHTML = '<a href="creator.html" class="btn btn-primary">+ Create Quiz</a>';
+    } else {
+      createBtnContainer.innerHTML = '<button class="btn btn-primary" onclick="handleSignup()">+ Create Quiz</a>';
+    }
+    
+    updateTabUI();
+    renderXPCard();
+    renderLeaderboard();
+    filterQuizzes();
+  });
+
+  // ── Tabs ─────────────────────────────────────────────
+  function setTab(tab) {
+    activeTab = tab;
+    updateTabUI();
+    filterQuizzes();
+  }
+
+  function updateTabUI() {
+    document.getElementById('tab-explore').classList.toggle('active', activeTab === 'explore');
+    document.getElementById('tab-my').classList.toggle('active', activeTab === 'my');
+    document.getElementById('page-title').textContent = activeTab === 'explore' ? 'Explore Public Quizzes' : 'My Personal Quizzes';
+    
+    const user = User.get();
+    if (activeTab === 'my' && !user.isLoggedIn) {
+      toast('Login to see your private quizzes', 'warn');
+      setTimeout(() => setTab('explore'), 100);
+    }
+  }
+
+  // ── Search Suggestions ──────────────────────────────
+  const suggestionsEl = document.getElementById('search-suggestions');
+  
+  function handleSearchInput(e) {
+    const query = e.target.value.toLowerCase().trim();
+    filterQuizzes();
+    
+    if (query.length < 2) {
+      suggestionsEl.classList.remove('active');
+      return;
+    }
+
+    const quizzes = Quizzes.all();
+    const matches = new Set();
+    const results = [];
+
+    quizzes.forEach(q => {
+      if (activeTab === 'my' && q.authorId !== User.get().id) return;
+      if (activeTab === 'explore' && q.visibility === 'private') return;
+
+      // Suggest topics/categories
+      if (q.category.toLowerCase().includes(query)) matches.add(`category:${q.category}`);
+      if (q.title.toLowerCase().includes(query)) matches.add(`title:${q.title}`);
+    });
+
+    Array.from(matches).slice(0, 6).forEach(m => {
+      const [type, val] = m.split(':');
+      results.push(`
+        <div class="suggestion-item" onclick="applySuggestion('${val.replace(/'/g, "\\'")}')">
+          <span class="icon">${type === 'category' ? '🏷️' : '📝'}</span>
+          <span class="text">${val}</span>
+          <span class="category">${type}</span>
+        </div>
+      `);
+    });
+
+    if (results.length > 0) {
+      suggestionsEl.innerHTML = results.join('');
+      suggestionsEl.classList.add('active');
+    } else {
+      suggestionsEl.classList.remove('active');
+    }
+  }
+
+  function applySuggestion(val) {
+    document.getElementById('search-input').value = val;
+    suggestionsEl.classList.remove('active');
+    filterQuizzes();
+  }
+
+  // Close suggestions when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-container')) {
+      suggestionsEl.classList.remove('active');
+    }
+  });
+
+  // ── Filters ────────────────────────────────────────────
+  function setCategory(cat) {
+    activeCategory = cat;
+    document.querySelectorAll('.filter-chips .chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.cat === cat);
+    });
+    filterQuizzes();
+  }
+
+  function filterQuizzes() {
+    const query  = document.getElementById('search-input').value.toLowerCase();
+    const sort   = document.getElementById('sort-select').value;
+    const user   = User.get();
+    let quizzes  = Quizzes.all();
+
+    // Tab filtering
+    if (activeTab === 'my') {
+      quizzes = quizzes.filter(q => q.authorId === user.id);
+    } else {
+      quizzes = quizzes.filter(q => q.visibility === 'public');
+    }
+
+    // Category filter
+    if (activeCategory !== 'all') {
+      quizzes = quizzes.filter(q => q.category === activeCategory);
+    }
+
+    // Search (Logic: strict to topic/title/category)
+    if (query) {
+      quizzes = quizzes.filter(q =>
+        q.title.toLowerCase().includes(query) ||
+        (q.category || '').toLowerCase().includes(query)
+      );
+    }
+
+    // Sort
+    quizzes.sort((a, b) => {
+      if (sort === 'newest')  return b.createdAt - a.createdAt;
+      if (sort === 'oldest')  return a.createdAt - b.createdAt;
+      if (sort === 'popular') return (b.playCount || 0) - (a.playCount || 0);
+      if (sort === 'az')      return a.title.localeCompare(b.title);
+      return 0;
+    });
+
+    renderQuizGrid(quizzes);
+
+    const sub = document.getElementById('quiz-count-sub');
+    const typeStr = activeTab === 'explore' ? 'public' : 'personal';
+    sub.textContent = `${quizzes.length} ${typeStr} quiz${quizzes.length !== 1 ? 'zes' : ''} available`;
+  }
+
+  // ── Render grid ────────────────────────────────────────
+  function renderQuizGrid(quizzes) {
+    const grid = document.getElementById('quiz-grid');
+    const empty = document.getElementById('empty-library');
+    const user = User.get();
+
+    if (quizzes.length === 0) {
+      grid.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    grid.innerHTML = quizzes.map((q, i) => {
+      const attempts  = Attempts.forQuiz(q.id);
+      const isOwner = user.isLoggedIn && (q.authorId === user.id);
+      const isPrivate = q.visibility === 'private';
+      
+      const bestScore = attempts.length
+        ? Math.max(...attempts.map(a => Math.round((a.score / a.total) * 100)))
+        : null;
+      const catEmoji  = { Science:'🔬', History:'📜', Math:'➗', Tech:'💻', Geography:'🌍', 'Pop Culture':'🎬', Language:'🗣', General:'🧩' };
+      const emoji     = catEmoji[q.category] || '🧩';
+      
+      return `
+        <div class="quiz-card" style="animation-delay:${i * 0.05}s" onclick="playQuiz('${q.id}')">
+          <div class="quiz-card-top">
+            <div class="quiz-card-meta">
+              ${categoryBadge(q.category)}
+              ${difficultyBadge(q.difficulty)}
+            </div>
+            
+            ${isPrivate ? `<div class="privacy-badge private">🔒 Private</div>` : ''}
+            
+            <div class="quiz-card-title">${emoji} ${q.title}</div>
+            ${q.description ? `<div class="quiz-card-desc">${q.description}</div>` : ''}
+            
+            <div class="quiz-card-stats">
+              <span>📝 ${q.questions.length}q</span>
+              <span>▷ ${q.playCount || 0} plays</span>
+              ${bestScore !== null ? `<span style="color:var(--neon-green)">🏅 ${bestScore}%</span>` : ''}
+            </div>
+
+            <div class="card-creator">
+               <div class="creator-avatar">👤</div>
+               <div class="creator-name">By <span>${q.authorName || 'Anonymous'}</span></div>
+            </div>
+          </div>
+          <div class="quiz-card-actions" onclick="event.stopPropagation()">
+            <button class="quiz-action-btn play" onclick="playQuiz('${q.id}')">▷ Play</button>
+            ${isOwner ? `
+              <button class="quiz-action-btn" onclick="editQuiz('${q.id}')">✏️ Edit</button>
+              <button class="quiz-action-btn" onclick="promptDelete('${q.id}', '${q.title.replace(/'/g, "\\'")}')">🗑</button>
+            ` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function playQuiz(id) { location.href = `player.html?quiz=${id}`; }
+  function editQuiz(id) { location.href = `creator.html?edit=${id}`; }
+
+  function promptDelete(id, title) {
+    pendingDeleteId = id;
+    document.getElementById('delete-quiz-title').textContent = title;
+    openModal('delete-modal');
+  }
+
+  function confirmDelete() {
+    if (!pendingDeleteId) return;
+    Quizzes.delete(pendingDeleteId).then(() => {
+      pendingDeleteId = null;
+      closeModal('delete-modal');
+      toast('Quiz deleted', 'info');
+      filterQuizzes();
+    });
+  }
+
+  // ── XP Card ────────────────────────────────────────────
+  function renderXPCard() {
+    const user = User.get();
+    const level = Math.floor(user.xp / 200) + 1;
+    const nextLevelXP = level * 200;
+    const progressPct = Math.min(((user.xp % 200) / 200) * 100, 100);
+
+    document.getElementById('xp-card').innerHTML = `
+      <div style="position:relative;z-index:1">
+        <div class="xp-avatar">${user.avatar}</div>
+        <div class="xp-name">${user.name}</div>
+        <div class="text-muted text-sm">Level ${level} Explorer</div>
+        <div class="xp-bar-wrap">
+          <div class="xp-bar-fill" id="xp-fill" style="width:0%"></div>
+        </div>
+        <div class="flex justify-between text-xs text-muted" style="margin-bottom:var(--space-4)">
+          <span class="font-mono">${user.xp} XP</span>
+          <span>Next: ${nextLevelXP} XP</span>
+        </div>
+        <div class="flex gap-4 justify-center">
+          <div>
+            <div class="font-bold" style="font-size:1.3rem;color:var(--neon-amber)">${user.xp}</div>
+            <div class="text-xs text-muted">Total XP</div>
+          </div>
+          <div>
+            <div class="font-bold" style="font-size:1.3rem;color:var(--neon-cyan)">${user.quizzesTaken || 0}</div>
+            <div class="text-xs text-muted">Quizzes</div>
+          </div>
+          <div>
+            <div class="font-bold" style="font-size:1.3rem;color:var(--neon-violet)">${level}</div>
+            <div class="text-xs text-muted">Level</div>
+          </div>
+        </div>
+      </div>`;
+
+    setTimeout(() => {
+      const fill = document.getElementById('xp-fill');
+      if (fill) fill.style.width = `${progressPct}%`;
+    }, 300);
+  }
+
+  // ── Leaderboard ────────────────────────────────────────
+  function renderLeaderboard() {
+    const entries = Leaderboard.all();
+    const user    = User.get();
+
+    document.getElementById('lb-body').innerHTML = entries.map((e, i) => {
+      const rank = i + 1;
+      const isYou = e.name === user.name;
+      const rankCls = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
+
+      return `
+        <div class="leaderboard-row" style="${isYou ? 'background:rgba(124,58,237,0.08);border-radius:var(--radius-sm)' : ''}">
+          <div class="leaderboard-rank ${rankCls}">${rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
+          <div class="leaderboard-avatar" style="background:var(--bg-elevated)">${e.avatar}</div>
+          <div class="leaderboard-name">${e.name}${isYou ? ' <span style="color:var(--text-muted);font-size:0.75rem">(you)</span>' : ''}</div>
+          <div class="leaderboard-xp">${e.xp.toLocaleString()}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function toggleLeaderboard() {
+    lbCollapsed = !lbCollapsed;
+    document.getElementById('lb-body').classList.toggle('collapsed', lbCollapsed);
+    document.getElementById('lb-toggle').classList.toggle('collapsed', lbCollapsed);
+  }
+  </script>
+</body>
+</html>

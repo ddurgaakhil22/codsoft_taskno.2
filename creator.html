@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUIZORA — Quiz Creator</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── AI Prompt Bar ───────────────────── */
+    .ai-bar {
+      background: var(--bg-card);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5) var(--space-6);
+      margin-bottom: var(--space-6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ai-bar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top left, rgba(124,58,237,0.08), transparent 60%);
+      pointer-events: none;
+    }
+
+    .ai-bar-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 4px 12px;
+      background: rgba(124,58,237,0.2);
+      border: 1px solid rgba(124,58,237,0.4);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #A78BFA;
+      letter-spacing: 0.05em;
+    }
+
+    .ai-bar-row {
+      display: flex;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .ai-prompt-input {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .ai-settings-row {
+      display: flex;
+      gap: var(--space-3);
+      margin-top: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .ai-settings-row .select { flex: 1; min-width: 130px; }
+
+    /* ── Layout ──────────────────────────── */
+    .creator-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: var(--space-6);
+      align-items: start;
+    }
+
+    .creator-sidebar {
+      position: sticky;
+      top: 90px;
+    }
+
+    /* ── Question Cards ───────────────────── */
+    .questions-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .question-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: all var(--transition-base);
+    }
+
+    .question-card:hover { border-color: rgba(124,58,237,0.25); }
+
+    .question-card-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4) var(--space-5);
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--glass-border);
+      cursor: pointer;
+    }
+
+    .drag-handle {
+      color: var(--text-muted);
+      cursor: grab;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .drag-handle:active { cursor: grabbing; }
+
+    .question-num {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .question-preview {
+      flex: 1;
+      font-size: 0.9rem;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .question-card-body {
+      padding: var(--space-5);
+      display: none;
+    }
+
+    .question-card.expanded .question-card-body { display: block; }
+    .question-card.expanded .question-card-header { background: rgba(124,58,237,0.05); border-color: rgba(124,58,237,0.2); }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+
+    .option-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .option-key {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .option-correct-radio {
+      width: 18px; height: 18px;
+      accent-color: var(--neon-green);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .option-correct-radio:checked + .option-key {
+      background: rgba(16,185,129,0.2);
+      color: var(--neon-green);
+    }
+
+    /* ── AI Result skeleton ───────────────── */
+    #ai-preview {
+      display: none;
+    }
+
+    .shimmer-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      margin-bottom: var(--space-4);
+    }
+
+    /* ── Sortable drag ghost ───────────────── */
+    .sortable-ghost {
+      opacity: 0.3;
+      background: rgba(124,58,237,0.1) !important;
+      border: 2px dashed rgba(124,58,237,0.4) !important;
+    }
+
+    .sortable-chosen { box-shadow: 0 8px 32px rgba(124,58,237,0.3) !important; }
+
+    /* ── Responsive ──────────────────────── */
+    @media (max-width: 900px) {
+      .creator-layout { grid-template-columns: 1fr; }
+      .creator-sidebar { position: static; }
+    }
+
+    @media (max-width: 768px) {
+      .creator-layout {
+        gap: var(--space-4);
+      }
+
+      .ai-bar {
+        padding: var(--space-4) var(--space-4);
+      }
+
+      .ai-bar-row {
+        flex-direction: column;
+        gap: var(--space-3);
+      }
+
+      .ai-settings-row {
+        flex-direction: column;
+      }
+
+      .ai-settings-row .select {
+        min-width: auto;
+      }
+
+      .question-card-header {
+        padding: var(--space-3);
+      }
+
+      .question-card-body {
+        padding: var(--space-3);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .creator-layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+      }
+
+      .creator-sidebar {
+        position: static;
+        order: -1;
+      }
+
+      .ai-bar {
+        padding: var(--space-3);
+        margin-bottom: var(--space-4);
+      }
+
+      .ai-badge {
+        font-size: 0.65rem;
+        padding: 2px 8px;
+      }
+
+      .ai-bar-header {
+        gap: var(--space-2);
+        margin-bottom: var(--space-3);
+      }
+
+      .ai-bar-row {
+        gap: var(--space-2);
+      }
+
+      .ai-settings-row {
+        gap: var(--space-2);
+        margin-top: var(--space-2);
+      }
+
+      .ai-settings-row .select {
+        font-size: 0.8rem;
+        padding: var(--space-2);
+      }
+
+      .questions-list {
+        gap: var(--space-2);
+      }
+
+      .question-card {
+        border-radius: var(--radius-md);
+      }
+
+      .question-card-header {
+        padding: var(--space-2);
+        gap: var(--space-2);
+      }
+
+      .question-num {
+        font-size: 0.85rem;
+      }
+
+      .question-text {
+        font-size: 0.9rem;
+      }
+
+      .question-card-body {
+        padding: var(--space-2);
+      }
+
+      .option-controls {
+        gap: var(--space-1);
+      }
+
+      .btn-sm {
+        padding: var(--space-1) var(--space-2);
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <nav class="nav" id="app-nav"></nav>
+
+  <div class="page-wrapper" style="z-index:1;position:relative">
+    <div id="login-required" class="hidden" style="position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+      <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-2xl);padding:var(--space-10);max-width:400px;text-align:center">
+        <div style="font-size:3rem;margin-bottom:var(--space-4)">🔒</div>
+        <h2 style="font-size:1.5rem;margin-bottom:var(--space-3)">Create Quizzes</h2>
+        <p style="color:var(--text-secondary);margin-bottom:var(--space-6)">You need to be logged in to create your own quizzes. Sign up today and start building amazing quizzes!</p>
+        <div style="display:flex;gap:var(--space-3);flex-direction:column">
+          <button class="btn btn-primary" style="width:100%" onclick="handleLogin()">✦ Log In</button>
+          <button class="btn btn-secondary" style="width:100%" onclick="handleSignup()">Create Account</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container" style="padding-top:var(--space-10);padding-bottom:var(--space-16)"}>
+
+      <!-- Page header -->
+      <div class="flex items-center justify-between mb-6" style="margin-bottom:var(--space-6)">
+        <div>
+          <h1 class="display-md" style="margin-bottom:var(--space-2)">Quiz Creator</h1>
+          <p class="text-secondary text-sm">Build manually or generate with AI</p>
+        </div>
+        <div class="flex gap-3">
+          <button class="btn btn-ghost" id="btn-preview" onclick="previewQuiz()">▷ Preview</button>
+          <button class="btn btn-primary" onclick="saveQuiz()">✓ Save Quiz</button>
+        </div>
+      </div>
+
+      <!-- ── AI Prompt Bar ──────────────────── -->
+      <div class="ai-bar" id="ai-bar-section">
+        <div class="ai-bar-header">
+          <div class="ai-badge">✦ AI GENERATE</div>
+          <span class="text-secondary text-sm">Describe a topic and AI will generate questions automatically</span>
+        </div>
+        <div class="ai-bar-row">
+          <input type="text" class="input ai-prompt-input" id="ai-prompt"
+            placeholder="e.g. The history of the Roman Empire, quantum computing basics, JavaScript closures..."
+            onkeydown="if(e.key==='Enter')generateWithAI()">
+          <button class="btn btn-primary" onclick="generateWithAI()" id="ai-generate-btn">
+            <span id="ai-btn-text">✦ Generate</span>
+          </button>
+        </div>
+        <div class="ai-settings-row">
+          <select class="select" id="ai-category">
+            <option value="General">General</option>
+            <option value="Science">Science</option>
+            <option value="History">History</option>
+            <option value="Math">Math</option>
+            <option value="Tech">Tech</option>
+            <option value="Geography">Geography</option>
+            <option value="Pop Culture">Pop Culture</option>
+            <option value="Language">Language</option>
+          </select>
+          <select class="select" id="ai-difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+          <select class="select" id="ai-numq">
+            <option value="5">5 questions</option>
+            <option value="8">8 questions</option>
+            <option value="10" selected>10 questions</option>
+            <option value="15">15 questions (max)</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-top:var(--space-4)">
+          <label class="text-secondary text-xs" style="display:block;margin-bottom:var(--space-1);font-weight:600">SOURCE CONTEXT (OPTIONAL) - Paste articles or notes for generation</label>
+          <textarea class="input" id="ai-context" rows="3" placeholder="Paste source text here for the AI to analyze deeply..." style="resize:vertical;min-height:80px;font-size:0.85rem;padding:var(--space-3)"></textarea>
+        </div>
+        <!-- AI skeleton/progress -->
+        <div id="ai-preview" style="margin-top:var(--space-5)"></div>
+      </div>
+
+      <!-- ── Main Layout ─────────────────────── -->
+      <div class="creator-layout">
+
+        <!-- Sidebar: Quiz settings -->
+        <div class="creator-sidebar">
+          <div class="glass-card">
+            <div class="section-title mb-4" style="margin-bottom:var(--space-4)">Quiz Settings</div>
+            <div class="flex-col gap-4">
+              <div class="form-group">
+                <label class="form-label">Title</label>
+                <input type="text" class="input" id="quiz-title" placeholder="My Awesome Quiz">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea class="textarea" id="quiz-desc" rows="3" placeholder="What's this quiz about?"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Category</label>
+                <select class="select" id="quiz-category">
+                  <option value="General">General</option>
+                  <option value="Science">Science</option>
+                  <option value="History">History</option>
+                  <option value="Math">Math</option>
+                  <option value="Tech">Tech</option>
+                  <option value="Geography">Geography</option>
+                  <option value="Pop Culture">Pop Culture</option>
+                  <option value="Language">Language</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Difficulty</label>
+                <select class="select" id="quiz-difficulty">
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Visibility</label>
+                <select class="select" id="quiz-visibility">
+                  <option value="public">🌍 Public (Visible to everyone)</option>
+                  <option value="private">🔒 Private (Only you can see)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Time per question (seconds)</label>
+                <input type="number" class="input" id="quiz-time" value="30" min="10" max="120">
+              </div>
+
+              <div class="neon-divider"></div>
+
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-secondary" id="q-count">0 questions</span>
+                <button class="btn btn-cyan btn-sm" onclick="addBlankQuestion()">+ Add Question</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Edit mode indicator -->
+          <div id="edit-banner" class="hidden" style="margin-top:var(--space-4);padding:var(--space-4);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:var(--radius-md);font-size:0.85rem;color:var(--neon-amber)">
+            ✏️ Editing existing quiz
+          </div>
+        </div>
+
+        <!-- Questions list -->
+        <div>
+          <div class="section-header">
+            <div class="section-title">Questions</div>
+            <button class="btn btn-secondary btn-sm" onclick="addBlankQuestion()">+ Add</button>
+          </div>
+
+          <div class="questions-list" id="questions-list">
+            <!-- Questions rendered here -->
+          </div>
+
+          <div id="empty-questions" class="empty-state">
+            <div class="empty-icon">📝</div>
+            <div class="empty-title">No questions yet</div>
+            <p class="empty-desc">Add questions manually below, or use the AI generator above to create a full quiz instantly.</p>
+            <button class="btn btn-primary mt-4" onclick="addBlankQuestion()">+ Add First Question</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sortable.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <script src="app.js"></script>
+  <script src="ai.js"></script>
+  <script>
+  'use strict';
+
+  // ── State ──────────────────────────────────────────────
+  let editingQuizId = null;
+  let questions     = [];
+
+  // ── Init ───────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    const user = User.get();
+    
+    // Check if user is logged in
+    if (!user?.isLoggedIn) {
+      document.getElementById('login-required').classList.remove('hidden');
+      document.querySelector('.container').style.display = 'none';
+      return;
+    }
+
+    // Check if editing existing quiz
+    const params = new URLSearchParams(location.search);
+    const editId  = params.get('edit');
+
+    if (editId) {
+      const quiz = Quizzes.get(editId);
+      if (quiz) {
+        // Check if current user is the owner of the quiz
+        if (quiz.authorId !== user.id) {
+          toast('You can only edit your own quizzes', 'error');
+          setTimeout(() => {
+            location.href = 'dashboard.html';
+          }, 1500);
+          document.querySelector('.container').style.display = 'none';
+          return;
+        }
+        
+        editingQuizId = editId;
+        document.getElementById('quiz-title').value      = quiz.title;
+        document.getElementById('quiz-desc').value       = quiz.description || '';
+        document.getElementById('quiz-category').value   = quiz.category;
+        document.getElementById('quiz-difficulty').value = quiz.difficulty;
+        document.getElementById('quiz-visibility').value = quiz.visibility || 'public';
+        document.getElementById('quiz-time').value       = quiz.timePerQuestion || 30;
+        questions = quiz.questions.map(q => ({ ...q }));
+        document.getElementById('edit-banner').classList.remove('hidden');
+        renderQuestions();
+      } else {
+        // Quiz not found
+        toast('Quiz not found', 'error');
+        setTimeout(() => {
+          location.href = 'dashboard.html';
+        }, 1500);
+        document.querySelector('.container').style.display = 'none';
+        return;
+      }
+    }
+
+    // Sortable
+    const list = document.getElementById('questions-list');
+    Sortable.create(list, {
+      handle: '.drag-handle',
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      chosenClass: 'sortable-chosen',
+      onEnd() { syncQuestionsFromDOM(); }
+    });
+  });
+
+  // ── Render all questions ───────────────────────────────
+  function renderQuestions() {
+    const list = document.getElementById('questions-list');
+    const empty = document.getElementById('empty-questions');
+    const countEl = document.getElementById('q-count');
+
+    countEl.textContent = `${questions.length} question${questions.length !== 1 ? 's' : ''}`;
+
+    if (questions.length === 0) {
+      list.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    list.innerHTML = questions.map((q, i) => renderQuestionCard(q, i)).join('');
+  }
+
+  function renderQuestionCard(q, i) {
+    const opts = q.options || ['', '', '', ''];
+    const labels = ['A', 'B', 'C', 'D'];
+    return `
+      <div class="question-card ${i === 0 ? 'expanded' : ''}" data-idx="${i}" id="qcard-${i}">
+        <div class="question-card-header" onclick="toggleCard(${i})">
+          <span class="drag-handle">⣿</span>
+          <span class="question-num">Q${i+1}</span>
+          <span class="question-preview">${q.text || 'Untitled question'}</span>
+          <div class="flex gap-2 items-center">
+            ${difficultyPips(q.difficulty || 'medium')}
+            <button class="btn btn-ghost btn-sm" onclick="deleteQuestion(${i},event)" title="Delete">✕</button>
+          </div>
+        </div>
+        <div class="question-card-body">
+          <div class="form-group">
+            <label class="form-label">Question Text</label>
+            <textarea class="textarea" rows="2" placeholder="Type your question here..."
+              oninput="updateQuestion(${i},'text',this.value)">${q.text || ''}</textarea>
+          </div>
+
+          <div class="options-grid" style="margin-top:var(--space-4)">
+            ${opts.map((opt, j) => `
+              <div class="option-row">
+                <input type="radio" class="option-correct-radio" name="correct-${i}"
+                  value="${j}" ${q.correct === j ? 'checked' : ''}
+                  onchange="updateQuestion(${i},'correct',${j})">
+                <div class="option-key">${labels[j]}</div>
+                <input type="text" class="input" value="${opt}"
+                  placeholder="Option ${labels[j]}"
+                  oninput="updateOption(${i},${j},this.value)"
+                  style="margin:0">
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="form-group" style="margin-top:var(--space-4)">
+            <label class="form-label">Explanation (shown after answer)</label>
+            <input type="text" class="input" placeholder="Why is this the correct answer?"
+              value="${q.explanation || ''}"
+              oninput="updateQuestion(${i},'explanation',this.value)">
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function toggleCard(idx) {
+    const card = document.getElementById(`qcard-${idx}`);
+    if (card) card.classList.toggle('expanded');
+  }
+
+  // ── Question mutations ─────────────────────────────────
+  function updateQuestion(idx, key, value) {
+    if (questions[idx]) {
+      questions[idx][key] = value;
+      // Update preview text without full re-render
+      if (key === 'text') {
+        const prev = document.querySelector(`#qcard-${idx} .question-preview`);
+        if (prev) prev.textContent = value || 'Untitled question';
+      }
+    }
+  }
+
+  function updateOption(idx, optIdx, value) {
+    if (questions[idx]) {
+      if (!questions[idx].options) questions[idx].options = ['','','',''];
+      questions[idx].options[optIdx] = value;
+    }
+  }
+
+  function addBlankQuestion() {
+    questions.push({
+      id: genId(),
+      text: '',
+      options: ['', '', '', ''],
+      correct: 0,
+      explanation: ''
+    });
+    renderQuestions();
+    // Expand the new one
+    setTimeout(() => {
+      const last = questions.length - 1;
+      const card = document.getElementById(`qcard-${last}`);
+      if (card) { card.classList.add('expanded'); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+    }, 50);
+  }
+
+  function deleteQuestion(idx, e) {
+    e.stopPropagation();
+    if (!confirm('Delete this question?')) return;
+    questions.splice(idx, 1);
+    renderQuestions();
+    toast('Question deleted', 'info');
+  }
+
+  function syncQuestionsFromDOM() {
+    const cards = document.querySelectorAll('.question-card[data-idx]');
+    const reordered = [];
+    cards.forEach(card => {
+      const idx = parseInt(card.dataset.idx);
+      if (questions[idx]) reordered.push(questions[idx]);
+    });
+    questions = reordered;
+  }
+
+  // ── AI Generation ──────────────────────────────────────
+  async function generateWithAI() {
+    const promptValue = document.getElementById('ai-prompt').value.trim();
+    const contextValue = document.getElementById('ai-context') ? document.getElementById('ai-context').value.trim() : '';
+    
+    if (!promptValue) { toast('Please enter a topic', 'warn'); return; }
+
+    const btn    = document.getElementById('ai-generate-btn');
+    const btnTxt = document.getElementById('ai-btn-text');
+    const preview = document.getElementById('ai-preview');
+
+    btn.disabled  = true;
+    btnTxt.textContent = '⏳ Thinking...';
+    preview.style.display = 'block';
+    setAiLoading('ai-preview', true);
+
+    try {
+      const result = await AI.generateQuiz({
+        topic:        promptValue,
+        category:     document.getElementById('ai-category').value,
+        difficulty:   document.getElementById('ai-difficulty').value,
+        numQuestions: parseInt(document.getElementById('ai-numq').value),
+        context:      contextValue
+      }, (status) => {
+        btnTxt.textContent = `⏳ ${status}`;
+      });
+
+      // Populate settings
+      if (result.title)       document.getElementById('quiz-title').value = result.title;
+      if (result.description) document.getElementById('quiz-desc').value  = result.description;
+
+      const cat = document.getElementById('ai-category').value;
+      document.getElementById('quiz-category').value   = cat;
+      document.getElementById('quiz-difficulty').value = document.getElementById('ai-difficulty').value;
+
+      // Set questions
+      questions = result.questions.map(q => ({
+        ...q,
+        id: genId()
+      }));
+
+      preview.style.display = 'none';
+      renderQuestions();
+      toast(`✦ ${questions.length} Precision Questions Synthesized!`, 'success');
+
+      // Scroll to questions
+      document.getElementById('questions-list').scrollIntoView({ behavior: 'smooth' });
+
+    } catch (err) {
+      console.error(err);
+      preview.style.display = 'none';
+      toast('AI Synthesis Busy. Using Precision Fallback.', 'warn');
+      
+      // Fallback
+      const fallback = AI.mockGenerate(promptValue, document.getElementById('ai-category').value, 'medium', 5);
+      questions = fallback.questions.map(q => ({ ...q, id: genId() }));
+      renderQuestions();
+    } finally {
+      btn.disabled = false;
+      btnTxt.textContent = '✦ Generate Again';
+    }
+  }
+
+  // ── Save Quiz ──────────────────────────────────────────
+  function saveQuiz() {
+    const title = document.getElementById('quiz-title').value.trim();
+    if (!title) { toast('Please add a quiz title', 'warn'); return; }
+    if (questions.length === 0) { toast('Add at least one question', 'warn'); return; }
+
+    // Validate questions
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i];
+      if (!q.text.trim()) { toast(`Question ${i+1} is empty`, 'warn'); return; }
+      const opts = q.options || [];
+      if (opts.some(o => !o.trim())) { toast(`Fill all options for Question ${i+1}`, 'warn'); return; }
+    }
+
+    const data = {
+      title,
+      description:      document.getElementById('quiz-desc').value.trim(),
+      category:         document.getElementById('quiz-category').value,
+      difficulty:       document.getElementById('quiz-difficulty').value,
+      visibility:       document.getElementById('quiz-visibility').value,
+      timePerQuestion:  parseInt(document.getElementById('quiz-time').value) || 30,
+      questions
+    };
+
+    if (editingQuizId) {
+      Quizzes.update(editingQuizId, data);
+      toast('Quiz updated!', 'success');
+    } else {
+      const q = Quizzes.create(data);
+      editingQuizId = q.id;
+      document.getElementById('edit-banner').classList.remove('hidden');
+      history.replaceState({}, '', `?edit=${q.id}`);
+      toast('Quiz saved!', 'success');
+    }
+  }
+
+  function previewQuiz() {
+    if (!editingQuizId) { saveQuiz(); return; }
+    location.href = `player.html?quiz=${editingQuizId}`;
+  }
+  </script>
+</body>
+</html>

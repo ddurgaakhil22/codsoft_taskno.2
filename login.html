@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUIZORA — Login</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .auth-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-6);
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-10);
+      backdrop-filter: var(--blur-md);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: var(--space-10);
+    }
+
+    .auth-header .logo {
+      font-size: 2rem;
+      margin-bottom: var(--space-3);
+    }
+
+    .auth-header h1 {
+      font-size: 1.4rem;
+      margin-bottom: var(--space-2);
+      color: var(--text-primary);
+    }
+
+    .auth-header p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .form-group {
+      margin-bottom: var(--space-5);
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    .input {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      background: var(--bg-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      transition: all var(--transition-base);
+    }
+
+    .input:focus {
+      outline: none;
+      border-color: var(--neon-violet);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+
+    .input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      margin-top: var(--space-6);
+      font-weight: 600;
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: var(--space-6);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .auth-footer a {
+      color: var(--neon-violet);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color var(--transition-base);
+    }
+
+    .auth-footer a:hover {
+      color: #A78BFA;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--glass-border);
+      margin: var(--space-6) 0;
+      position: relative;
+    }
+
+    .divider span {
+      position: absolute;
+      left: 50%;
+      top: -0.55rem;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      padding: 0 var(--space-2);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .demo-info {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin-bottom: var(--space-6);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .demo-info strong {
+      color: var(--neon-green);
+      display: block;
+      margin-bottom: var(--space-1);
+    }
+
+    @media (max-width: 480px) {
+      .auth-wrapper {
+        padding: var(--space-4);
+      }
+
+      .auth-card {
+        max-width: 100%;
+        padding: var(--space-6);
+        border-radius: var(--radius-lg);
+      }
+
+      .auth-header {
+        margin-bottom: var(--space-6);
+      }
+
+      .auth-header .logo {
+        font-size: 1.5rem;
+        margin-bottom: var(--space-2);
+      }
+
+      .auth-header h1 {
+        font-size: 1.2rem;
+        margin-bottom: var(--space-1);
+      }
+
+      .auth-header p {
+        font-size: 0.9rem;
+      }
+
+      .form-group {
+        margin-bottom: var(--space-4);
+      }
+
+      .form-label {
+        font-size: 0.9rem;
+        margin-bottom: var(--space-1);
+      }
+
+      .input {
+        padding: var(--space-2) var(--space-3);
+        font-size: 0.9rem;
+      }
+
+      .btn-login {
+        padding: var(--space-2) var(--space-3);
+        margin-top: var(--space-4);
+        font-size: 0.95rem;
+      }
+
+      .auth-footer {
+        margin-top: var(--space-4);
+        font-size: 0.85rem;
+      }
+
+      .divider {
+        margin: var(--space-4) 0;
+      }
+
+      .demo-info {
+        padding: var(--space-3);
+        margin-bottom: var(--space-4);
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background orbs -->
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav" id="app-nav"></nav>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo">🧠</div>
+        <h1>Welcome Back</h1>
+        <p>Log in to access all features and create more quizzes</p>
+      </div>
+
+      <div class="demo-info">
+        <strong>💡 Demo Access</strong>
+        Try a few free quizzes without logging in. Create an account to unlock unlimited quizzes!
+      </div>
+
+      <form onsubmit="handleLoginSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="input" id="email" placeholder="your@email.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="input" id="password" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-login">
+          ✦ Log In
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="signup.html">Create one</a>
+      </div>
+
+      <div class="divider">
+        <span>or</span>
+      </div>
+
+      <button class="btn btn-ghost" style="width: 100%;" onclick="continuasDemo()">
+        Continue as Guest (Demo)
+      </button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      const loginBtn = e.target.querySelector('button');
+      loginBtn.disabled = true;
+      loginBtn.innerText = 'Logging In...';
+
+      try {
+        const res = await fetch('http://localhost:3000/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Login failed');
+        }
+
+        // Try to store session
+        try {
+          if (typeof User !== 'undefined' && User.set) {
+            User.set({ ...data, isLoggedIn: true });
+          }
+        } catch (e) {
+          console.warn('Error storing user:', e);
+        }
+        
+        // Try to show welcome message
+        try {
+          if (typeof toast === 'function') {
+            toast(`Welcome back, ${data.name || 'User'}! 👋`, 'success');
+          }
+        } catch (e) {
+          console.warn('Error showing toast:', e);
+        }
+        
+        // REDIRECT NOW - This must work
+        window.location.href = './dashboard.html';
+        return false;
+
+      } catch (err) {
+        console.error('Login error:', err);
+        try {
+          if (typeof toast === 'function') {
+            toast(err.message || 'Login failed', 'error');
+          } else {
+            alert('Login failed: ' + (err.message || 'Unknown error'));
+          }
+        } catch (e) {
+          alert('Login failed: ' + (err.message || 'Unknown error'));
+        }
+        loginBtn.disabled = false;
+        loginBtn.innerText = '✦ Log In';
+      }
+    }
+
+    function continuasDemo() {
+      const user = {
+        name: 'Guest User',
+        xp: 0,
+        quizzesTaken: 0,
+        avatar: '👤',
+        isLoggedIn: false,
+        isGuest: true,
+        demoQuizzesTaken: 0
+      };
+      
+      User.set(user);
+      toast('Welcome to QUIZORA! Try a few free quizzes.', 'info');
+      
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 1500);
+    }
+  </script>
+</body>
+</html>

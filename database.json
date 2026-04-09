@@ -1,0 +1,1002 @@
+{
+  "quizzes": [
+    {
+      "id": "mnror2pylcogw",
+      "createdAt": 1775751764614,
+      "updatedAt": 1775751764625,
+      "playCount": 0,
+      "visibility": "public",
+      "context": "",
+      "title": "html (Local Fallback)",
+      "description": "An automatically generated quiz covering html.",
+      "category": "Tech",
+      "difficulty": "easy",
+      "timePerQuestion": 30,
+      "questions": [
+        {
+          "id": "mnroqzc6ghqc7",
+          "text": "Which HTML element is used for the largest heading?",
+          "options": [
+            "<h6>",
+            "<head>",
+            "<h1>",
+            "<title>"
+          ],
+          "correct": 2,
+          "explanation": "The <h1> tag represents the highest level heading."
+        },
+        {
+          "id": "mnroqzc63xycd",
+          "text": "What does HTML stand for?",
+          "options": [
+            "Hyper Text Markup Language",
+            "Home Tool Markup Language",
+            "Hyperlinks and Text Markup Language",
+            "High Tech Modern Language"
+          ],
+          "correct": 0,
+          "explanation": "HTML is the standard markup language for creating Web pages."
+        },
+        {
+          "id": "mnroqzc656yz7",
+          "text": "Which tag is used to create a hyperlink?",
+          "options": [
+            "<link>",
+            "<a>",
+            "<href>",
+            "<nav>"
+          ],
+          "correct": 1,
+          "explanation": "The <a> (anchor) tag is used to define hyperlinks."
+        },
+        {
+          "id": "mnroqzc6tcked",
+          "text": "Which attribute specifies the connection link in an <a> tag?",
+          "options": [
+            "src",
+            "link",
+            "href",
+            "url"
+          ],
+          "correct": 2,
+          "explanation": "The href attribute indicates the link's destination."
+        },
+        {
+          "id": "mnroqzc6vec4x",
+          "text": "How can you make a numbered list?",
+          "options": [
+            "<dl>",
+            "<list>",
+            "<ul>",
+            "<ol>"
+          ],
+          "correct": 3,
+          "explanation": "The <ol> tag defines an ordered (numbered) list."
+        }
+      ],
+      "authorId": "mnrn2updx1ixb",
+      "authorName": "user"
+    },
+    {
+      "id": "mnrmoclck0660",
+      "createdAt": 1775748278208,
+      "updatedAt": 1775752431707,
+      "playCount": 3,
+      "visibility": "public",
+      "context": "",
+      "title": "Object-Oriented Programming (OOP) Concepts Quiz",
+      "description": "Test your understanding of core Object-Oriented Programming concepts including classes, objects, inheritance, polymorphism, encapsulation, and abstraction.",
+      "category": "Language",
+      "difficulty": "medium",
+      "timePerQuestion": 30,
+      "questions": [
+        {
+          "id": "mnrmdb9gtgbmc",
+          "text": "What is an object in Object-Oriented Programming?",
+          "options": [
+            "A function",
+            "An instance of a class",
+            "A variable",
+            "A loop"
+          ],
+          "correct": 1,
+          "explanation": "An object is an instance of a class that contains data and methods."
+        },
+        {
+          "id": "mnrmdfmn8wxzz",
+          "text": "Which concept binds data and methods together?",
+          "options": [
+            "Inheritance",
+            "Encapsulation",
+            "Polymorphism",
+            "Abstraction"
+          ],
+          "correct": 1,
+          "explanation": "Encapsulation combines data and methods into a single unit (class)."
+        },
+        {
+          "id": "mnrmdilbwsm2u",
+          "text": "What is a class in OOP?",
+          "options": [
+            "An object",
+            "A blueprint for creating objects",
+            "A method",
+            "A variable"
+          ],
+          "correct": 1,
+          "explanation": "A class is a blueprint or template used to create objects."
+        },
+        {
+          "id": "mnrmjezsylkmu",
+          "text": "What is method overriding?",
+          "options": [
+            "Defining a method in child class with same name and parameters",
+            "Changing method name",
+            "Using multiple classes",
+            "Creating new methods"
+          ],
+          "correct": 0,
+          "explanation": "Method overriding allows a subclass to provide a specific implementation of a method already defined in parent class."
+        },
+        {
+          "id": "mnrmjh5u5fe0d",
+          "text": "Which concept allows a child class to inherit properties from a parent class?",
+          "options": [
+            "Encapsulation",
+            "Abstraction",
+            "Inheritance",
+            "Polymorphism"
+          ],
+          "correct": 2,
+          "explanation": "Inheritance allows a class to acquire properties and behaviors of another class."
+        }
+      ],
+      "authorId": "mnrn2updx1ixb",
+      "authorName": "user"
+    },
+    {
+      "id": "mnrfi5wjsouxh",
+      "createdAt": 1775736232291,
+      "updatedAt": 1775736232301,
+      "playCount": 0,
+      "visibility": "private",
+      "title": "computer (Local Fallback)",
+      "description": "An automatically generated quiz covering computer.",
+      "category": "Tech",
+      "difficulty": "medium",
+      "timePerQuestion": 30,
+      "questions": [
+        {
+          "id": "mnrfhit4z6usz",
+          "text": "In the context of Tech, how is computer primarily applied?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of computer",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying computer."
+        },
+        {
+          "id": "mnrfhit4q5pt5",
+          "text": "In the context of Tech, how is computer primarily applied?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of computer",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying computer."
+        },
+        {
+          "id": "mnrfhit4e853z",
+          "text": "What is the primary function of computer?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of computer",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying computer."
+        },
+        {
+          "id": "mnrfhit4miw5a",
+          "text": "Which of the following describes a core principle of computer?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of computer",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying computer."
+        },
+        {
+          "id": "mnrfhit41chm0",
+          "text": "What is a key component often associated with computer?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of computer",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying computer."
+        }
+      ],
+      "authorId": "mnrepdlc1jdio",
+      "authorName": "developer"
+    },
+    {
+      "id": "mnrexxxlfh7cl",
+      "createdAt": 1775735288841,
+      "updatedAt": 1775739560053,
+      "playCount": 0,
+      "visibility": "public",
+      "title": "Html Basics",
+      "description": "An automatically generated quiz covering html.",
+      "category": "Tech",
+      "difficulty": "easy",
+      "timePerQuestion": 30,
+      "questions": [
+        {
+          "id": "mnrexajwd01jr",
+          "text": "Which HTML element is used for the largest heading?",
+          "options": [
+            "<h6>",
+            "<head>",
+            "<h1>",
+            "<title>"
+          ],
+          "correct": 2,
+          "explanation": "The <h1> tag represents the highest level heading."
+        },
+        {
+          "id": "mnrexajwre72e",
+          "text": "What does HTML stand for?",
+          "options": [
+            "Hyper Text Markup Language",
+            "Home Tool Markup Language",
+            "Hyperlinks and Text Markup Language",
+            "High Tech Modern Language"
+          ],
+          "correct": 0,
+          "explanation": "HTML is the standard markup language for creating Web pages."
+        },
+        {
+          "id": "mnrexajwaia7i",
+          "text": "Which tag is used to create a hyperlink?",
+          "options": [
+            "<link>",
+            "<a>",
+            "<href>",
+            "<nav>"
+          ],
+          "correct": 1,
+          "explanation": "The <a> (anchor) tag is used to define hyperlinks."
+        },
+        {
+          "id": "mnrexajwuj26l",
+          "text": "Which attribute specifies the connection link in an <a> tag?",
+          "options": [
+            "src",
+            "link",
+            "href",
+            "url"
+          ],
+          "correct": 2,
+          "explanation": "The href attribute indicates the link's destination."
+        },
+        {
+          "id": "mnrexajwp59a9",
+          "text": "How can you make a numbered list?",
+          "options": [
+            "<dl>",
+            "<list>",
+            "<ul>",
+            "<ol>"
+          ],
+          "correct": 3,
+          "explanation": "The <ol> tag defines an ordered (numbered) list."
+        }
+      ],
+      "authorId": "mnrepdlc1jdio",
+      "authorName": "developer"
+    },
+    {
+      "id": "mnrdh0jhoh2um",
+      "createdAt": 1775732819453,
+      "updatedAt": 1775739582172,
+      "playCount": 3,
+      "visibility": "public",
+      "title": "Quantum Physics 101",
+      "description": "",
+      "category": "Science",
+      "difficulty": "easy",
+      "timePerQuestion": 30,
+      "questions": [
+        {
+          "id": "mnrdezl15v4zr",
+          "text": "What is the speed of light?",
+          "options": [
+            "300,000 km/s",
+            "150,000 km/s",
+            "Unknown",
+            "Infinity"
+          ],
+          "correct": 0,
+          "explanation": "Speed of light is 299,792,458 m/s"
+        }
+      ],
+      "authorId": "mnrepdlc1jdio",
+      "authorName": "developer"
+    },
+    {
+      "id": "mnqd0ggug5dgc",
+      "createdAt": 1775671580766,
+      "updatedAt": 1775671614930,
+      "playCount": 0,
+      "title": "computer networks",
+      "description": "An automatically generated quiz covering computer networks.",
+      "category": "Tech",
+      "difficulty": "medium",
+      "timePerQuestion": 10,
+      "questions": [
+        {
+          "id": "mnqczrj6k66ng",
+          "text": "What is a key component often associated with computer networks?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of computer networks",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying computer networks."
+        },
+        {
+          "id": "mnqczrj6wa3so",
+          "text": "Which of these is a common misconception about computer networks?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of computer networks",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying computer networks."
+        },
+        {
+          "id": "mnqczrj64wftq",
+          "text": "What is the primary function of computer networks?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of computer networks",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying computer networks."
+        },
+        {
+          "id": "mnqczrj6q4wen",
+          "text": "In the context of Tech, how is computer networks primarily applied?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of computer networks",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying computer networks."
+        }
+      ]
+    },
+    {
+      "id": "quiz_pop_001",
+      "title": "Pop Culture 2020s",
+      "description": "Movies, music, and memes from the 2020s",
+      "category": "Pop Culture",
+      "difficulty": "easy",
+      "timePerQuestion": 20,
+      "createdAt": 1775497803453,
+      "updatedAt": 1775671321042,
+      "playCount": 402,
+      "questions": [
+        {
+          "id": "q1",
+          "text": "Which streaming show featured a deadly squid game competition?",
+          "options": [
+            "Money Heist",
+            "Squid Game",
+            "Alice in Borderland",
+            "The Platform"
+          ],
+          "correct": 1,
+          "explanation": "Squid Game (2021) by Netflix became the most-watched non-English series in its history."
+        },
+        {
+          "id": "q2",
+          "text": "Which movie became the highest-grossing film of all time (re-released)?",
+          "options": [
+            "Endgame",
+            "Avatar",
+            "Titanic",
+            "Spider-Man: No Way Home"
+          ],
+          "correct": 1,
+          "explanation": "Avatar (2009, re-released 2022) reclaimed the top spot with $2.9 billion worldwide."
+        },
+        {
+          "id": "q3",
+          "text": "Who won the Oscar for Best Picture in 2023?",
+          "options": [
+            "Everything Everywhere All at Once",
+            "The Fabelmans",
+            "Tár",
+            "All Quiet on the Western Front"
+          ],
+          "correct": 0,
+          "explanation": "Everything Everywhere All at Once swept the 2023 Oscars with 7 wins including Best Picture."
+        },
+        {
+          "id": "q4",
+          "text": "What does 'NPC' stand for in gaming/internet culture?",
+          "options": [
+            "New Player Character",
+            "Non-Playable Character",
+            "Network Protocol Code",
+            "No Personal Control"
+          ],
+          "correct": 1,
+          "explanation": "NPC (Non-Playable Character) — characters controlled by the game AI, now a popular internet meme."
+        }
+      ]
+    },
+    {
+      "id": "mnqbzp7thmfjg",
+      "createdAt": 1775669865833,
+      "updatedAt": 1775671471738,
+      "playCount": 0,
+      "title": "css basics",
+      "description": "An automatically generated quiz covering css basics.",
+      "category": "Tech",
+      "difficulty": "easy",
+      "timePerQuestion": 30,
+      "questions": [
+        {
+          "id": "mnqbz51qax8r8",
+          "text": "What does CSS stand for?",
+          "options": [
+            "Computer Style Sheets",
+            "Cascading Style Sheets",
+            "Colorful Style Sheets",
+            "Creative Style Sheets"
+          ],
+          "correct": 1,
+          "explanation": "CSS describes how HTML elements are to be displayed."
+        },
+        {
+          "id": "mnqbz51rk9x5p",
+          "text": "Which property is used to change the background color?",
+          "options": [
+            "bgcolor",
+            "color",
+            "background-color",
+            "bg-color"
+          ],
+          "correct": 2,
+          "explanation": "The background-color property sets the background color of an element."
+        },
+        {
+          "id": "mnqbz51r3hidb",
+          "text": "How does css basics differentiate itself within Tech?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of css basics",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying css basics."
+        },
+        {
+          "id": "mnqbz51rm2o7n",
+          "text": "Which of these is a common misconception about css basics?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of css basics",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying css basics."
+        },
+        {
+          "id": "mnqbz51r7bc46",
+          "text": "In the context of Tech, how is css basics primarily applied?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of css basics",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying css basics."
+        },
+        {
+          "id": "mnqbz51rgn53g",
+          "text": "What is the primary function of css basics?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of css basics",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying css basics."
+        },
+        {
+          "id": "mnqbz51rppojt",
+          "text": "Which statement best defines the importance of css basics?",
+          "options": [
+            "A fundamental mechanism of Tech",
+            "The primary structural element of css basics",
+            "An advanced, rarely used feature",
+            "None of the above"
+          ],
+          "correct": 1,
+          "explanation": "Understanding these basic traits is essential when studying css basics."
+        }
+      ]
+    },
+    {
+      "id": "q_demo_js",
+      "authorId": "system",
+      "title": "JavaScript Fundamentals",
+      "description": "Test your JS knowledge",
+      "category": "Tech",
+      "difficulty": "medium",
+      "playCount": 2,
+      "createdAt": 1775668622972,
+      "updatedAt": 1775669736338,
+      "questions": [
+        {
+          "id": "q1",
+          "text": "Which keyword defines a constant in JS?",
+          "options": [
+            "var",
+            "let",
+            "const",
+            "def"
+          ],
+          "correct": 2,
+          "explanation": "const defines block-scoped variables that cannot be reassigned."
+        }
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "id": "mnrp5dfgt9y8a",
+      "timestamp": 1775752431676,
+      "quizId": "mnrmoclck0660",
+      "score": 4,
+      "total": 5,
+      "xp": 55,
+      "answers": [
+        0,
+        0,
+        1,
+        2,
+        1
+      ],
+      "timings": [
+        4,
+        5,
+        4,
+        6,
+        8
+      ],
+      "totalTime": 44,
+      "streak": 3
+    },
+    {
+      "id": "mnrop6ri5mtiz",
+      "timestamp": 1775751676542,
+      "quizId": "mnrmoclck0660",
+      "score": 3,
+      "total": 5,
+      "xp": 35,
+      "answers": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "timings": [
+        11,
+        3,
+        3,
+        2,
+        3
+      ],
+      "totalTime": 27,
+      "streak": 2
+    },
+    {
+      "id": "mnrn7cbk9gln1",
+      "timestamp": 1775749164320,
+      "quizId": "mnrmoclck0660",
+      "score": 4,
+      "total": 5,
+      "xp": 55,
+      "answers": [
+        3,
+        0,
+        2,
+        1,
+        1
+      ],
+      "timings": [
+        15,
+        5,
+        3,
+        10,
+        3
+      ],
+      "totalTime": 50,
+      "streak": 4
+    },
+    {
+      "id": "mnrhhyo95u4bj",
+      "timestamp": 1775739582153,
+      "quizId": "mnrdh0jhoh2um",
+      "score": 1,
+      "total": 1,
+      "xp": 17,
+      "answers": [
+        0
+      ],
+      "timings": [
+        3
+      ],
+      "totalTime": 4,
+      "streak": 1
+    },
+    {
+      "id": "mnrgxjtueq3hs",
+      "timestamp": 1775738629794,
+      "quizId": "mnrdh0jhoh2um",
+      "score": 0,
+      "total": 1,
+      "xp": 0,
+      "answers": [
+        -1
+      ],
+      "timings": [
+        30
+      ],
+      "totalTime": 33,
+      "streak": 0
+    },
+    {
+      "id": "mnrfc8zedrg7l",
+      "timestamp": 1775735956346,
+      "quizId": "mnrextjd0rssm",
+      "score": 2,
+      "total": 5,
+      "xp": 19,
+      "answers": [
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "timings": [
+        1,
+        1,
+        2,
+        2,
+        4
+      ],
+      "totalTime": 13,
+      "streak": 1
+    },
+    {
+      "id": "mnrfagfi3b3oj",
+      "timestamp": 1775735872686,
+      "quizId": "mnrexq0lo2sv4",
+      "score": 3,
+      "total": 5,
+      "xp": 36,
+      "answers": [
+        2,
+        2,
+        2,
+        2,
+        0
+      ],
+      "timings": [
+        2,
+        1,
+        2,
+        2,
+        3
+      ],
+      "totalTime": 12,
+      "streak": 2
+    },
+    {
+      "id": "mnrf8t4l1c6rw",
+      "timestamp": 1775735795829,
+      "quizId": "mnrexw6v0z9h0",
+      "score": 3,
+      "total": 5,
+      "xp": 35,
+      "answers": [
+        2,
+        1,
+        0,
+        2,
+        1
+      ],
+      "timings": [
+        12,
+        11,
+        5,
+        5,
+        5
+      ],
+      "totalTime": 50,
+      "streak": 3
+    },
+    {
+      "id": "mnrevt1frj9ra",
+      "timestamp": 1775735189187,
+      "quizId": "mnrdh0jhoh2um",
+      "score": 1,
+      "total": 1,
+      "xp": 16,
+      "answers": [
+        0
+      ],
+      "timings": [
+        4
+      ],
+      "totalTime": 6,
+      "streak": 1
+    },
+    {
+      "id": "mnqcuw138me9g",
+      "timestamp": 1775671320999,
+      "quizId": "quiz_pop_001",
+      "score": 1,
+      "total": 4,
+      "xp": 5,
+      "answers": [
+        3,
+        1,
+        -1,
+        -1
+      ],
+      "timings": [
+        20,
+        13,
+        20,
+        20
+      ],
+      "totalTime": 109,
+      "streak": 1
+    },
+    {
+      "id": "att3",
+      "quizId": "quiz_tech_001",
+      "score": 3,
+      "total": 5,
+      "xp": 22,
+      "timestamp": 1775411403453,
+      "timeTaken": 140,
+      "answers": [
+        1,
+        1,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "id": "att5",
+      "quizId": "quiz_pop_001",
+      "score": 3,
+      "total": 4,
+      "xp": 28,
+      "timestamp": 1775238603453,
+      "timeTaken": 55,
+      "answers": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "att3",
+      "quizId": "quiz_tech_001",
+      "score": 3,
+      "total": 5,
+      "xp": 22,
+      "timestamp": 1775411393501,
+      "timeTaken": 140,
+      "answers": [
+        1,
+        1,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "id": "att5",
+      "quizId": "quiz_pop_001",
+      "score": 3,
+      "total": 4,
+      "xp": 28,
+      "timestamp": 1775238593501,
+      "timeTaken": 55,
+      "answers": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "att3",
+      "quizId": "quiz_tech_001",
+      "score": 3,
+      "total": 5,
+      "xp": 22,
+      "timestamp": 1775411096002,
+      "timeTaken": 140,
+      "answers": [
+        1,
+        1,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "id": "att5",
+      "quizId": "quiz_pop_001",
+      "score": 3,
+      "total": 4,
+      "xp": 28,
+      "timestamp": 1775238296002,
+      "timeTaken": 55,
+      "answers": [
+        1,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "mnqbwxa3v79iv",
+      "timestamp": 1775669736315,
+      "quizId": "q_demo_js",
+      "score": 0,
+      "total": 1,
+      "xp": 0,
+      "answers": [
+        0
+      ],
+      "timings": [
+        4
+      ],
+      "totalTime": 7,
+      "streak": 0
+    },
+    {
+      "id": "mnqbwhgoqzlbo",
+      "timestamp": 1775669715816,
+      "quizId": "q_demo_js",
+      "score": 0,
+      "total": 1,
+      "xp": 0,
+      "answers": [
+        1
+      ],
+      "timings": [
+        1
+      ],
+      "totalTime": 2,
+      "streak": 0
+    }
+  ],
+  "users": [
+    {
+      "id": "mnrdcn7i55vkf",
+      "name": "Test User",
+      "email": "test@example.com",
+      "password": "password123",
+      "avatar": "🎯",
+      "xp": 0,
+      "quizzesTaken": 0,
+      "createdAt": 1775732615550,
+      "isLoggedIn": true
+    },
+    {
+      "id": "mnrdopk1cwx41",
+      "name": "akhil",
+      "email": "Akhil@f",
+      "password": "qwertyuiop",
+      "avatar": "🎯",
+      "xp": 0,
+      "quizzesTaken": 0,
+      "createdAt": 1775733178465,
+      "isLoggedIn": true
+    },
+    {
+      "id": "mnrdpo5jwtgwa",
+      "name": "akhil",
+      "email": "akhil@gmail.com",
+      "password": "Akhil112",
+      "avatar": "🎯",
+      "xp": 0,
+      "quizzesTaken": 0,
+      "createdAt": 1775733223303,
+      "isLoggedIn": true
+    },
+    {
+      "id": "mnrepdlc1jdio",
+      "name": "developer",
+      "email": "tester112@gmail.com",
+      "password": "Akhil@112",
+      "avatar": "🎯",
+      "xp": 17,
+      "quizzesTaken": 2,
+      "createdAt": 1775734889232,
+      "isLoggedIn": true
+    },
+    {
+      "id": "mnretk868wrln",
+      "name": "Tester",
+      "email": "tester@example.com",
+      "password": "password123",
+      "avatar": "🎯",
+      "xp": 0,
+      "quizzesTaken": 0,
+      "createdAt": 1775735084454,
+      "isLoggedIn": true
+    },
+    {
+      "id": "mnrf16c93lcgp",
+      "name": "hacker",
+      "email": "hacker@gmail.com",
+      "password": "Hacker112",
+      "avatar": "🎯",
+      "xp": 90,
+      "quizzesTaken": 3,
+      "createdAt": 1775735439705,
+      "isLoggedIn": true
+    },
+    {
+      "id": "mnrn2updx1ixb",
+      "name": "user",
+      "email": "user@gmail.com",
+      "password": "Akhil112",
+      "avatar": "🎯",
+      "xp": 145,
+      "quizzesTaken": 3,
+      "createdAt": 1775748954865,
+      "isLoggedIn": true
+    }
+  ]
+}

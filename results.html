@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUIZORA — Results</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js"></script>
+  <style>
+    .results-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: var(--space-10) var(--space-6) var(--space-16);
+    }
+
+    /* ── Score hero ──────────────────────────── */
+    .score-hero {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--space-8);
+      align-items: center;
+      margin-bottom: var(--space-8);
+      padding: var(--space-8);
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-2xl);
+      backdrop-filter: var(--blur-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .score-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top left, rgba(124,58,237,0.1), transparent 60%);
+      pointer-events: none;
+    }
+
+    .score-ring-container {
+      position: relative;
+      width: 160px;
+      height: 160px;
+    }
+
+    .score-ring-container svg { transform: rotate(-90deg); }
+    .ring-bg   { fill: none; stroke: var(--bg-elevated); stroke-width: 8; }
+    .ring-fill {
+      fill: none;
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 440.7;
+      stroke-dashoffset: 440.7;
+      transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .ring-pct {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .ring-label-sm { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    .score-meta { position: relative; z-index: 1; }
+
+    .score-title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: var(--space-2);
+    }
+
+    .score-subtitle { color: var(--text-secondary); margin-bottom: var(--space-5); }
+
+    /* ── Stat bento ──────────────────────────── */
+    .stat-bento {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-4);
+      margin-bottom: var(--space-8);
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      text-align: center;
+      transition: all var(--transition-base);
+    }
+
+    .stat-card:hover { transform: translateY(-3px); }
+
+    .stat-icon { font-size: 1.5rem; margin-bottom: var(--space-2); }
+    .stat-num  { font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; }
+    .stat-lbl  { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* ── Question breakdown ───────────────────── */
+    .q-breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      margin-bottom: var(--space-8);
+    }
+
+    .q-row {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-base);
+    }
+
+    .q-row.correct-row { border-color: rgba(16,185,129,0.3); }
+    .q-row.wrong-row   { border-color: rgba(236,72,153,0.3); }
+    .q-row.timeout-row { border-color: rgba(245,158,11,0.2); }
+
+    .q-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+    .q-content { flex: 1; }
+    .q-text { font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; }
+    .q-answers { font-size: 0.8rem; color: var(--text-muted); }
+    .q-timing  { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); flex-shrink: 0; }
+
+    .explain-btn {
+      flex-shrink: 0;
+      align-self: flex-start;
+    }
+
+    .ai-explain-box {
+      margin-top: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: rgba(124,58,237,0.07);
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      display: none;
+      animation: fadeUp 0.3s ease;
+    }
+
+    .ai-explain-box.visible { display: block; }
+
+    /* ── Chart section ───────────────────────── */
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+
+    /* ── Actions row ─────────────────────────── */
+    .actions-row {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 720px) {
+      .score-hero  { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+      .stat-bento  { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .results-wrap {
+        padding: var(--space-6) var(--space-3);
+      }
+
+      .score-hero {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+
+      .score-display {
+        font-size: 3rem;
+      }
+
+      .score-label {
+        font-size: 0.9rem;
+      }
+
+      .stat-bento {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+      }
+
+      .stat-card {
+        padding: var(--space-3);
+      }
+
+      .stat-num {
+        font-size: 1.5rem;
+      }
+
+      .stat-label {
+        font-size: 0.8rem;
+      }
+
+      .actions-row {
+        gap: var(--space-2);
+      }
+
+      .actions-row .btn {
+        font-size: 0.85rem;
+        padding: var(--space-2) var(--space-3);
+        flex: 1;
+        min-width: auto;
+      }
+
+      .review-section {
+        gap: var(--space-2);
+      }
+
+      .review-card {
+        padding: var(--space-3);
+      }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <nav class="nav" id="app-nav"></nav>
+
+  <div class="page-wrapper" style="z-index:1;position:relative">
+    <div class="results-wrap">
+      <!-- Content rendered by JS -->
+      <div id="results-content">
+        <div class="empty-state">
+          <div class="empty-icon">⏳</div>
+          <div class="empty-title">Loading results...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="ai.js"></script>
+  <script>
+  'use strict';
+
+  let result = null;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const raw = sessionStorage.getItem('qfy_result');
+    if (!raw) { location.href = 'dashboard.html'; return; }
+
+    result = JSON.parse(raw);
+    renderResults();
+
+    // Fire confetti for high scores
+    if (result.pct >= 90) {
+      setTimeout(() => fireConfetti(), 600);
+    }
+  });
+
+  // ── Render ─────────────────────────────────────────────
+  function renderResults() {
+    const { quizTitle, score, total, pct, xp, streak, totalTime, questions, answers, timings } = result;
+
+    const grade = pct >= 90 ? { label: '🏆 Excellent!', color: 'var(--neon-green)' }
+                : pct >= 70 ? { label: '✦ Good Job!',   color: 'var(--neon-cyan)' }
+                : pct >= 50 ? { label: '💪 Keep Going', color: 'var(--neon-amber)' }
+                :             { label: '📚 Keep Learning', color: 'var(--neon-pink)' };
+
+    const circumference = 440.7;
+    const strokeColor = pct >= 90 ? '#10B981'
+                       : pct >= 70 ? '#06B6D4'
+                       : pct >= 50 ? '#F59E0B'
+                       : '#EC4899';
+
+    // History for chart
+    const history = Attempts.forQuiz(result.quizId).slice(0, 10).reverse();
+
+    document.getElementById('results-content').innerHTML = `
+      <!-- Score hero -->
+      <div class="score-hero">
+        <div class="score-ring-container">
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            <circle class="ring-bg"   cx="80" cy="80" r="70"/>
+            <circle class="ring-fill" cx="80" cy="80" r="70"
+              id="score-ring"
+              style="stroke:${strokeColor}"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-pct" style="color:${strokeColor}" id="pct-display">0%</div>
+            <div class="ring-label-sm">${score}/${total} correct</div>
+          </div>
+        </div>
+
+        <div class="score-meta">
+          <div class="score-title">${grade.label}</div>
+          <div class="score-subtitle">${quizTitle}</div>
+          <div class="flex gap-3 flex-wrap">
+            <span class="badge badge-violet">+${xp} XP earned</span>
+            ${streak >= 3 ? `<span class="badge badge-amber">🔥 ${streak} streak</span>` : ''}
+            <span class="badge badge-muted">⏱ ${fmtTime(totalTime)}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stat bento -->
+      <div class="stat-bento">
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-num" style="color:var(--neon-green)">${score}</div>
+          <div class="stat-lbl">Correct</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">❌</div>
+          <div class="stat-num" style="color:var(--neon-pink)">${total - score}</div>
+          <div class="stat-lbl">Wrong</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-num">${fmtTime(totalTime)}</div>
+          <div class="stat-lbl">Total Time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⚡</div>
+          <div class="stat-num" style="color:var(--neon-amber)">${xp}</div>
+          <div class="stat-lbl">XP Earned</div>
+        </div>
+      </div>
+
+      <!-- Question breakdown -->
+      <div class="section-header">
+        <div class="section-title">Question Breakdown</div>
+      </div>
+      <div class="q-breakdown" id="q-breakdown">
+        ${questions.map((q, i) => {
+          const chosen = answers[i];
+          const isTimeout = chosen === -1;
+          const isCorrect = chosen === q.correct;
+          const cls       = isTimeout ? 'timeout-row' : isCorrect ? 'correct-row' : 'wrong-row';
+          const icon      = isTimeout ? '⏱️' : isCorrect ? '✅' : '❌';
+          const t         = timings && timings[i] ? `${timings[i]}s` : '';
+
+          const yourAns    = isTimeout ? 'Timed out' : (q.options[chosen] || '—');
+          const correctAns = q.options[q.correct];
+
+          return `
+            <div class="q-row ${cls}">
+              <div class="q-icon">${icon}</div>
+              <div class="q-content">
+                <div class="q-text">${q.text}</div>
+                <div class="q-answers">
+                  ${isCorrect ? `<span style="color:var(--neon-green)">✓ ${correctAns}</span>`
+                  : `<span style="color:var(--text-muted)">Your answer: ${yourAns}</span>
+                     &nbsp;•&nbsp;
+                     <span style="color:var(--neon-green)">Correct: ${correctAns}</span>`}
+                </div>
+                <div class="ai-explain-box" id="explain-${i}"></div>
+              </div>
+              <div class="q-timing">${t}</div>
+              ${!isCorrect ? `<button class="btn btn-ghost btn-sm explain-btn" onclick="explainWrong(${i})" id="explain-btn-${i}">🤖 Explain</button>` : ''}
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <!-- History chart -->
+      ${history.length > 1 ? `
+        <div class="chart-card">
+          <div class="section-header">
+            <div class="section-title">Score History</div>
+            <span class="text-muted text-sm">${history.length} attempts</span>
+          </div>
+          <canvas id="history-chart" height="120"></canvas>
+        </div>
+      ` : ''}
+
+      <!-- Actions -->
+      <div class="actions-row">
+        <a href="player.html?quiz=${result.quizId}" class="btn btn-primary btn-lg">↺ Retry Quiz</a>
+        <a href="dashboard.html" class="btn btn-secondary btn-lg">← Library</a>
+        <a href="creator.html?edit=${result.quizId}" class="btn btn-ghost btn-lg">✏️ Edit Quiz</a>
+      </div>
+    `;
+
+    // Animate score ring
+    requestAnimationFrame(() => {
+      const ring = document.getElementById('score-ring');
+      const pctEl = document.getElementById('pct-display');
+      if (ring) {
+        setTimeout(() => {
+          ring.style.strokeDashoffset = circumference * (1 - pct/100);
+        }, 200);
+      }
+      // Count up percentage
+      let current = 0;
+      const target = pct;
+      const interval = setInterval(() => {
+        current = Math.min(current + 2, target);
+        if (pctEl) pctEl.textContent = `${current}%`;
+        if (current >= target) clearInterval(interval);
+      }, 20);
+    });
+
+    // Chart
+    if (history.length > 1) {
+      setTimeout(() => renderChart(history), 100);
+    }
+  }
+
+  // ── History chart ───────────────────────────────────────
+  function renderChart(history) {
+    const ctx = document.getElementById('history-chart');
+    if (!ctx) return;
+
+    const labels = history.map((_, i) => `Attempt ${i+1}`);
+    const data   = history.map(a => Math.round((a.score / a.total) * 100));
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Score %',
+          data,
+          borderColor: '#7C3AED',
+          backgroundColor: 'rgba(124,58,237,0.15)',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#A78BFA',
+          pointBorderColor: '#7C3AED',
+          pointRadius: 5,
+          tension: 0.4,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#14142A',
+            borderColor: 'rgba(124,58,237,0.4)',
+            borderWidth: 1,
+            titleColor: '#F0F0FF',
+            bodyColor: '#9090B0',
+            callbacks: { label: ctx => `Score: ${ctx.raw}%` }
+          }
+        },
+        scales: {
+          x: {
+            grid:  { color: 'rgba(255,255,255,0.04)' },
+            ticks: { color: '#50507A', font: { family: 'JetBrains Mono', size: 11 } }
+          },
+          y: {
+            min: 0, max: 100,
+            grid:  { color: 'rgba(255,255,255,0.04)' },
+            ticks: { color: '#50507A', font: { family: 'JetBrains Mono', size: 11 }, callback: v => `${v}%` }
+          }
+        }
+      }
+    });
+  }
+
+  // ── AI Explanation ──────────────────────────────────────
+  async function explainWrong(idx) {
+
+
+    const btn = document.getElementById(`explain-btn-${idx}`);
+    const box = document.getElementById(`explain-${idx}`);
+    if (!btn || !box) return;
+
+    btn.disabled = true;
+    btn.textContent = '⏳';
+    box.classList.add('visible');
+    box.innerHTML = `<div class="skeleton" style="height:14px;width:80%"></div><div class="skeleton" style="height:14px;width:60%;margin-top:8px"></div>`;
+
+    const q = result.questions[idx];
+    try {
+      const explanation = await AI.explainAnswer({
+        question:      q.text,
+        userAnswer:    q.options[result.answers[idx]] || 'Timed out',
+        correctAnswer: q.options[q.correct],
+        explanation:   q.explanation || ''
+      });
+      box.innerHTML = `<span style="color:var(--text-accent)">🤖</span> ${explanation}`;
+      btn.style.display = 'none';
+    } catch (err) {
+      box.innerHTML = `<span style="color:var(--neon-pink)">${aiErrorMessage(err)}</span>`;
+      btn.disabled  = false;
+      btn.textContent = '🤖 Explain';
+    }
+  }
+
+  // ── Confetti ────────────────────────────────────────────
+  function fireConfetti() {
+    const count = 200;
+    const defaults = { origin: { y: 0.6 } };
+
+    function fire(particleRatio, opts) {
+      confetti({ ...defaults, ...opts,
+        particleCount: Math.floor(count * particleRatio) });
+    }
+
+    fire(0.25, { spread: 26, startVelocity: 55 });
+    fire(0.20, { spread: 60 });
+    fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+    fire(0.10, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+    fire(0.10, { spread: 120, startVelocity: 45 });
+  }
+  </script>
+</body>
+</html>
